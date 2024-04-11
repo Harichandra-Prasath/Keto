@@ -7,16 +7,18 @@ import (
 	"time"
 )
 
-func Monitor() {
+func Monitor(CONN_STATUS *bool) {
 	// Check the underlying ethernet interface
+
 	for {
-		time.Sleep(1 * time.Second)
-		checkInteface()
+		checkInteface(CONN_STATUS)
+		time.Sleep(10 * time.Second)
 	}
 
 }
 
-func checkInteface() {
+func checkInteface(PREV_CONN_STATUS *bool) {
+
 	grep := exec.Command("grep", "ethernet")
 	list := exec.Command("nmcli", "device", "status")
 
@@ -36,10 +38,25 @@ func checkInteface() {
 
 	if strings.Contains(res, "unavailable") {
 		slog.Info("Ethernet Interface is  Unavailable")
-	} else if strings.Contains(res, "unavailable") {
+		if *(PREV_CONN_STATUS) {
+			*(PREV_CONN_STATUS) = false
+		}
+	} else if strings.Contains(res, "disconnected") {
 		slog.Info("Ethernet Interface is Available but Disconnected")
+		if *(PREV_CONN_STATUS) {
+			*(PREV_CONN_STATUS) = false
+		}
 	} else {
 		slog.Info("Ethernet Inteface is Available and Connected")
+		if !*(PREV_CONN_STATUS) {
+			*(PREV_CONN_STATUS) = true
+			slog.Debug("Attempting to send Mail to notify")
+			err := SendMail()
+			if err != nil {
+				slog.Error("Error sending Mail", "error", err.Error())
+			}
+		}
+
 	}
 
 }
