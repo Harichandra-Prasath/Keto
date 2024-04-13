@@ -24,6 +24,8 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
+	Initialse_Mail()
+
 	// Assuming the user starts with connection, even if its not the case
 	// it will be updated to false
 	PREV_CONN_STATUS := true

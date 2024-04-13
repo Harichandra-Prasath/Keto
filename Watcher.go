@@ -7,12 +7,15 @@ import (
 	"time"
 )
 
+// can be change for user preference
+var Duration time.Duration = 10 * time.Minute
+
 func Monitor(CONN_STATUS *bool) {
 	// Check the underlying ethernet interface
 
 	for {
 		checkInteface(CONN_STATUS)
-		time.Sleep(10 * time.Second)
+		time.Sleep(Duration)
 	}
 
 }
@@ -51,10 +54,7 @@ func checkInteface(PREV_CONN_STATUS *bool) {
 		if !*(PREV_CONN_STATUS) {
 			*(PREV_CONN_STATUS) = true
 			slog.Debug("Attempting to send Mail to notify")
-			err := SendMail()
-			if err != nil {
-				slog.Error("Error sending Mail", "error", err.Error())
-			}
+			go SendMail()
 		}
 
 	}
