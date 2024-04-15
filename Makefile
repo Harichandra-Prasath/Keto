@@ -1,5 +1,5 @@
 run: build
-	@./bin/Keto
+	@./bin/Keto &
 
 build:
 	@go build -o ./bin/Keto
